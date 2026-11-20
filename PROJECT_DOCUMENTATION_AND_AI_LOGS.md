@@ -10,7 +10,7 @@
 - **GitHub repo**: https://github.com/Haxionbuilders/travbud
 - **GitHub Pages branch**: `main` (root `/`)
 - **Tech**: Vanilla single-file React (Vite-bundled, baked into one `index.html`)
-- **Auth token (GitHub)**: `ghp_[REDACTED - stored separately]` (Haxionbuilders account)
+- **Auth token (GitHub)**: `ghp_[REDACTED_SECRET]` (Haxionbuilders account)
 
 ### Source files:
 | File | Purpose |
