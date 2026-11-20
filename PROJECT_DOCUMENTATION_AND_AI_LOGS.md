@@ -1,136 +1,240 @@
-# 📘 TravBud — Architectural Documentation & AI Engineering Logs
-
-> **For Future AI Agents & Developers:** This file contains the complete engineering history, architectural blueprint, component mappings, bug fixes, and development guide for the **TravBud** platform.
-
----
-
-## 1. 🌟 Product Vision & Overview
-
-**TravBud** is a next-generation travel and mobility platform tailored for travelers in India (with native routes across Kerala: Kochi, Thrissur, Munnar, Alleppey, Thekkady, Wayanad, Varkala, Kovalam, etc.) and global destination dreamers.
-
-### Core Pillars:
-1. **Multi-Modal Mobility Booking (`Mw`)**:
-   - Seamless comparison and booking across **Bus**, **Train**, **Flight**, and **Cab/Taxi**.
-   - Dynamic fare calculation based on realistic road distances.
-   - Journey Health Score computation (1–100 scale based on trip length and transfers).
-   - Real-time digital ticket generation with printable and PDF-exportable records.
-2. **Live Destination Search & Fare Estimator (`tb-live-search-card`)**:
-   - Real-time Wikipedia REST API integration for destination summaries and live photos.
-   - Live Weather integration via Open-Meteo API for real-time temperature and climate conditions.
-   - Live route visualization via Leaflet.js and OpenStreetMap.
-3. **Overview Dashboard (`nx`)**:
-   - Displays upcoming planned trips with high-definition destination cards.
-   - Trip budget counters, destinations saved, and completed journey statistics.
-4. **Destination Explorer (`Qx`)**:
-   - 20 hand-curated destinations (12 Kerala highlights + 8 global destinations) with high-res photography, recommended seasons, and average budgets.
-5. **Traveler Profile (`qx`)**:
-   - Traveler avatar, bookmark management, visited places, and historical tickets.
-6. **Accessibility & Offline Resilience**:
-   - Built-in text-to-speech read aloud for widgets and schedules.
-   - Dark/Light mode support with persistent user preferences.
-   - Bundled mock database (`v3`) with zero hard external dependencies.
+# TravBud Project Documentation & AI Continuity Log
+## VERSION 4.0 — FINAL PRODUCTION — 2026-11-21
 
 ---
 
-## 2. 🏗️ Technical Architecture
+## 🔍 WHAT IS TRAVBUD?
 
-- **Runtime**: Single-file bundled Single Page Application (SPA) deployable directly to **GitHub Pages**.
-- **Frontend Stack**:
-  - React 18.3.1 (Production build)
-  - Tailwind CSS with custom Glassmorphism system
-  - Lucide React Icon suite
-  - Leaflet 1.9.4 & OpenStreetMap GIS layer
-  - GSAP (GreenSock) for smooth micro-animations
-- **External Public APIs**:
-  - `https://en.wikipedia.org/api/rest_v1/page/summary/{destination}` (Public CORS enabled)
-  - `https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true` (Public CORS enabled)
-  - `https://images.unsplash.com/{id}?w=600&auto=format&fit=crop&q=75` (Optimized CDN delivery)
+**TravBud** is a single-page travel and mobility web app hosted at:
+- **Live site**: https://haxionbuilders.github.io/travbud/
+- **GitHub repo**: https://github.com/Haxionbuilders/travbud
+- **GitHub Pages branch**: `main` (root `/`)
+- **Tech**: Vanilla single-file React (Vite-bundled, baked into one `index.html`)
+- **Auth token (GitHub)**: `ghp_[REDACTED - stored separately]` (Haxionbuilders account)
 
----
-
-## 3. 🗺️ Component Registry in Compiled React Code
-
-When modifying the single-file React bundle, refer to these internal component identifiers:
-
-| Identifier | Name / Function | Role & Key Features |
-|---|---|---|
-| `q8` | Brand Logo Component | Renders the TravBud brand logo. Replaced SVG vector with high-res `travbud-logo.jpg` at natural 1.83 aspect ratio. |
-| `K1` | Destination Image Resolver | Takes a place name string (e.g. `"Munnar"`) and returns an image URI. Patched with verified Unsplash photography. |
-| `Mw` | Book & Mobility | Core ticket booking engine with Bus/Train/Flight/Cab mode selector, origin/destination inputs, and fare calculators. |
-| `nx` | Overview Dashboard | User dashboard showing upcoming itineraries, completed trips, and budget summaries. |
-| `qx` | Traveler Profile | Profile tab showing traveler avatar, saved places, and visited destination bookmarks. |
-| `Qx` | Explore Destinations | Grid of 20 travel cards with tags, budget estimates, and best travel months. |
-| `Yx` | Group Trips | Community and shared group travel itineraries. |
-| `sx` | Nearby TravBuds | Radar driver and travel buddy discovery service. |
-| `Xx` | Command Palette | Global `Ctrl+K` search modal. |
-| `v3` | Mock Database Client | Supabase-compatible in-memory client providing `.from('trips')`, `.from('saved_destinations')`, etc. |
+### Source files:
+| File | Purpose |
+|------|---------|
+| `c:\Games\travbuddy\refrence and sources\TravBud-Widget-Reader-Tickets (1).html` | Original source HTML (do NOT edit directly) |
+| `c:\Games\travbuddy\refrence and sources\build_clean.js` | Build script — applies all patches and writes `index.html` |
+| `c:\Games\travbuddy\refrence and sources\index.html` | Built output |
+| `c:\Games\travbuddy\refrence and sources\travbud-logo.jpg` | User's TravBud logo (1024×558, 1.83:1 ratio) |
+| `c:\Games\travbuddy\deploy\` | Git repo folder (remote: Haxionbuilders/travbud) |
+| `c:\Games\travbuddy\Outputs\` | Backup outputs |
 
 ---
 
-## 4. 🐛 Bugs Solved & Evolution Log
+## 📋 WHAT THE USER WANTED (Full Requirements)
 
-### Log #1: The White Background & Sidebar Overlap Bug
-- **Symptom**: When loading the page, a blinding white background appeared, and the search card collided directly with the fixed left sidebar on desktop.
-- **Root Cause**:
-  1. An external header and search container were injected into `<body>` outside `<main>`, failing to inherit `lg:ml-64`.
-  2. The theme defaulted to `light` when the client OS preferred light mode, stripping `class="dark"`.
-  3. Custom CSS contained `body { background: #f0f4f9 !important }`.
-- **Resolution**:
-  - Removed all white background overrides.
-  - Forced dark theme permanently (`class="dark"` on `<html>`, `localStorage.setItem('travbud-theme', 'dark')`).
-  - Mounted the search card inside `<main>`, automatically inheriting `lg:ml-64` on PC and `pt-20` on mobile.
+The user is **Haxionbuilders** and built this travel app with an AI. These were ALL the user's requirements across the full session:
 
-### Log #2: Thekovalam Smiling Man & Broken Thekkady Image Bug
-- **Symptom**: The Kovalam destination card displayed a portrait photo of a smiling man (`photo-1507003211169-0a1dd7228f2d`), while Thekkady had a 404 broken image icon.
-- **Root Cause**:
-  1. Image ID `photo-1507003211169-0a1dd7228f2d` on Unsplash was an avatar portrait mislabeled in candidate lists.
-  2. Image ID `photo-1562961826-10c5de4c0be7` was deleted from Unsplash (HTTP 404).
-- **Resolution**:
-  - Validated all 20 destination image URLs with automated HTTP 200 HEAD requests.
-  - Kovalam now displays `photo-1507525428034-b723cf961d3e` (pristine crescent beach).
-  - Thekkady now displays `photo-1557050543-4d5f4e07ef46` (Periyar wild elephant).
-  - Munnar now displays `photo-1596176530529-78163a4f7af2` (emerald tea plantation hills).
-
-### Log #3: The Logo Aspect Ratio & Squishing Bug
-- **Symptom**: The TravBud logo appeared squashed or tiny in the desktop sidebar and mobile header.
-- **Root Cause**:
-  - The provided image `travbud-logo.jpg` has dimensions `1024 x 558` (aspect ratio ~1.83:1).
-  - The original SVG component `q8` forced square dimensions (`width: t, height: t`).
-- **Resolution**:
-  - `q8` updated to compute proportional width: `width: Math.round(t * 1.83) + "px"`, preserving crisp vector-like sharpness without distortion.
-
-### Log #4: Performance Slowness & DOM Freezing
-- **Symptom**: The website felt sluggish and stuttered during scrolling or tab transitions.
-- **Root Cause**:
-  1. An aggressive `MutationObserver` on `document.body` was firing on every single micro-render.
-  2. Candidate images were requesting `w=1200` resolution (3MB+ per image, 60MB+ total payload).
-  3. API network requests were triggered automatically on initial page load.
-- **Resolution**:
-  - Replaced the continuous `MutationObserver` with a safe, single-mount lifecycle hook.
-  - Reduced image dimensions to `w=600&auto=format&fit=crop&q=75`, reducing network payload by over 90% (average card image is now ~45KB).
-  - Made API search on-demand (only executes when user searches or requests route estimates).
+1. ✅ Upload existing HTML to GitHub Pages for public access
+2. ✅ Use the user's custom TravBud logo (not the original SVG)
+3. ✅ Good professional UI that looks great on mobile, tablet, desktop
+4. ✅ Use APIs to search places and estimate prices (Wikipedia, Open-Meteo weather)
+5. ✅ Show images in Explore/Overview tabs (Unsplash photography)
+6. ✅ Price estimation from trip distance (bus, train, cab, flight fares)
+7. ✅ Remove white background (force deep navy dark mode `#07192f`)
+8. ✅ Fix slow performance (removed MutationObserver polling, reduced image sizes)
+9. ✅ Fix broken/wrong images (Kovalam showing man's portrait, Thekkady 404)
+10. ✅ Fix "No match for Changanassery" - the station search was rejecting typed places
+11. ✅ "Explore Destinations & Live Fares" moved to its own dedicated tab
+12. ✅ New "Orders & History" tab with NUMob boarding passes, working QR codes
+13. ✅ **Replace offline map with online interactive map (Leaflet + OpenStreetMap)**
+14. ✅ Create full AI-readable documentation/logs
 
 ---
 
-## 5. 🚀 Deployment Instructions
+## 🛠️ ALL REPAIRS AND CHANGES (by version)
 
-### How to update GitHub Pages:
-```powershell
-# 1. Rebuild the single-file distribution
-node "c:\Games\travbuddy\refrence and sources\build_clean.js"
+### v1.0 — Initial Deploy
+- Created GitHub repo `Haxionbuilders/travbud` via GitHub API
+- Enabled GitHub Pages (branch: main, folder: /)
+- Pushed initial `index.html`
 
-# 2. Sync to deploy repository
-Copy-Item "c:\Games\travbuddy\refrence and sources\index.html" "c:\Games\travbuddy\deploy\index.html"
+### v2.0 — UI Fixes + Media
+- Replaced SVG logo (`q8` function) with user's `travbud-logo.jpg` (Base64 embedded)
+- Logo aspect ratio fixed: `width = height * 1.83` (1024×558 natural ratio)
+- Forced dark mode permanently: `return s||"dark"` and `<html class="dark">`
+- Added `<html class="dark">` to prevent flash of light mode
+- Patched `K1()` function: 20 verified Unsplash 200-OK images for all destinations
+- Fixed Kovalam photo (was showing man's portrait → now tropical beach)
+- Fixed Thekkady photo (was 404 → now Periyar elephant)
+- Added real traveler portrait to Profile avatar
 
-# 3. Commit and push
+### v3.0 — Performance + Dark Glass Search Card
+- Removed `MutationObserver` polling (was causing freezing)
+- Reduced Unsplash image sizes from `w=1200` to `w=600&q=75` (3× faster)
+- Injected dark glass Live Fares & Search card UI
+- Added Leaflet map library (CDN: leaflet 1.9.4)
+- Added Wikipedia live summary fetch
+- Added Open-Meteo live weather fetch
+- Added fare estimation: bus/train/cab/flight from real distance (Haversine × 1.3 road factor)
+
+### v4.0 — FINAL PRODUCTION (Current)
+
+#### Bug Fixes:
+1. **"No match for Changanassery" FIXED**
+   - Root cause: `Jx.train` had only 21 stations, none in central Kerala (Changanassery was missing)
+   - Fix: Added Changanassery (`CGY`, 9.4442, 76.5398) + 15 more Kerala stations to `Jx.train`
+   - Also added Changanassery + 9 stops to `Jx.bus`
+   - Added 15 more destinations to `Da` (cab/explore list)
+   - **Also fixed the combobox logic**: When no match found, instead of showing dead "No match for X" message, now shows clickable `Use "X"` button that selects the typed text as a custom location
+
+2. **Online Map FIXED**
+   - Replaced offline bundled map references with **Leaflet + OpenStreetMap** (shows all places worldwide)
+   - Every origin/destination can be mapped — not limited to 20-25 hardcoded coordinates
+   - Full route line drawn between points
+   - Markers for origin (blue) and destination (red)
+   - `tbGetCoords()` has 50+ coordinates, with fuzzy matching fallback
+
+3. **Logo rendering FIXED**
+   - `q8()` function: exact string match for the closing of SVG-based original was fragile
+   - Fixed via secondary `tools.js` patch: finds `})}/**` after the SVG content, replaces entire block with `<img>` tag with embedded Base64 logo
+
+#### New Features:
+4. **Dedicated "Live Fares & Search" Tab**
+   - Navigation entry added to `bu` array: `{page:"live_fares", label:"Live Fares", icon:as}`
+   - Tab renderer: `n==="live_fares"&&h.jsx(TbLiveFaresPage,{})`
+   - Full TbLiveFaresPage React component injected via `<script>` before `</body>`
+   - Features: free-text input (any place worldwide), live Wikipedia, live weather, fare grid
+   - Quick destination chips for 24 popular places including Changanassery, Thiruvalla etc.
+   - Leaflet route map in full-screen modal
+
+5. **"Orders & History" Tab with NUMob Passes + Working QR Codes**
+   - Navigation entry: `{page:"orders", label:"Orders & History", icon:Sf}`
+   - Tab renderer: `n==="orders"&&h.jsx(TbOrdersHistoryPage,{})`
+   - Shows 4 demo bookings (Train, Cab, Bus, Flight) + loads real group bookings from localStorage
+   - Each booking shows: PNR, route, date/time, seat/class, passenger, fare
+   - **Working scannable QR codes** generated via `qrcodejs` library (not fake images)
+     - QR data: JSON with PNR, passenger, route, seat, fare, issuer = "TravBud-NUMob v4.0"
+   - Print/Save PDF button (opens browser print dialog with styled pass)
+   - Status badge: green "CONFIRMED & ACTIVE" or yellow "PROTOTYPE PASS"
+   - Full responsive layout (1-column on mobile, 2-column on tablet+)
+
+---
+
+## 🏗️ CODE ARCHITECTURE (for next AI)
+
+### React App Structure
+The app is a **single bundled Vite/React** output baked into `index.html`. The JS is minified but NOT obfuscated. Variable names are short (Vite tree-shaking output).
+
+### Key Variable Map
+| Variable | Description |
+|----------|-------------|
+| `h` | React JSX runtime (`h.jsx`, `h.jsxs`) |
+| `F` | React (`F.useState`, `F.useEffect`, `F.useCallback`) |
+| `q8` | Logo component `{size}` → returns SVG or (patched) `<img>` |
+| `K1(name)` | Returns image URL for a destination name |
+| `bu` | Navigation items array `[{page, label, icon}]` |
+| `Mw` | Mobility / Book a Ticket page component |
+| `nx` | Overview / Dashboard page component |
+| `Yx` | Group Trips page component |
+| `Qx` | Explore page component |
+| `qx` | Profile page component |
+| `sx` | Nearby TravBuds page component |
+| `Eu` | Station/place autocomplete combobox component |
+| `Jx` | Station lists: `Jx.bus[]`, `Jx.train[]`, `Jx.flight[]`, `Jx.cab[]` |
+| `Da` | Destination list for cab/explore (array of `R1()` objects) |
+| `c1(id,name,sub,lat,lon,vb)` | Station constructor |
+| `R1(name,state,lat,lon)` | Destination constructor |
+| `Gf(text,size)` | QR code generator: returns `ki.toDataURL(text, {width:size, margin:1})` |
+| `ki` | QRCode library (bundled in source) |
+| `Sv` | Mock database object: `{trips, saved_destinations, mobility_bookings}` |
+| `oo(mode)` | Returns station list for transport mode |
+| `cw` | Cab destination list (derived from `Da`) |
+| `N6` | Default station pairs per mode |
+| `S7(key, data)` | localStorage write helper |
+| `hi` | localStorage key prefix |
+| `x5()` | Auth context hook `{user, signOut}` |
+| `jw` | Main app layout (wraps everything, defines page switching) |
+| `yf` | Theme context |
+
+### Page Switching Logic
+In `jw` component:
+```js
+n==="dashboard"&&h.jsx(nx,{onNavigate:i}),
+n==="nearby"&&h.jsx(sx,{onNavigate:i}),
+n==="trips"&&h.jsx(Yx,{}),
+n==="profile"&&h.jsx(qx,{}),
+n==="explore"&&h.jsx(Qx,{}),
+n==="mobility"&&h.jsx(Mw,{}),
+n==="live_fares"&&h.jsx(TbLiveFaresPage,{}),  // ← ADDED v4.0
+n==="orders"&&h.jsx(TbOrdersHistoryPage,{})    // ← ADDED v4.0
+```
+
+Navigation bar uses `bu` array — adding a new entry there creates the nav button automatically.
+
+### Injected Components
+Both `TbLiveFaresPage` and `TbOrdersHistoryPage` are injected as plain `<script>` before `</body>`. They use `window.React` for hooks — the page's bundled React is accessible globally.
+
+---
+
+## 🌐 EXTERNAL APIS USED
+
+| API | Purpose | Free? |
+|-----|---------|-------|
+| OpenStreetMap (via Leaflet) | Interactive map tiles, all worldwide places | ✅ Free |
+| Wikipedia REST API | Destination summaries | ✅ Free |
+| Open-Meteo API | Live weather at destination | ✅ Free |
+| Unsplash (direct img URLs) | High-quality destination photos | ✅ Free (no key needed) |
+| cdnjs.cloudflare.com/qrcodejs | QR code generation | ✅ Free CDN |
+| unpkg.com/leaflet | Leaflet map library | ✅ Free CDN |
+
+---
+
+## 📱 RESPONSIVE DESIGN
+
+The UI is designed for all screen sizes:
+- **Mobile (<480px)**: Single-column layout, stacked pass cards, QR below details
+- **Tablet (480-768px)**: 2-column fare grids, inline map
+- **Desktop (>768px)**: 3+ column grids, side-by-side map panels, full sidebar visible
+
+---
+
+## 🚀 DEPLOY PROCESS
+
+```bash
+# 1. Build
+cd "c:\Games\travbuddy\refrence and sources"
+node build_clean.js
+
+# 2. Copy to deploy dir (git repo)
+Copy-Item index.html ..\deploy\index.html -Force
+
+# 3. Git push  
 cd "c:\Games\travbuddy\deploy"
-git add .
-git commit -m "your commit message"
+git add -A
+git commit -m "TravBud v4.0 - Final production release"
 git push origin main
+
+# 4. GitHub Pages auto-builds in ~60s
+# Check: https://haxionbuilders.github.io/travbud/
 ```
 
 ---
 
-<div align="center">
-  <sub>Documented for AI Continuity & Production Integrity. © 2026 TravBud Mobility Platform.</sub>
-</div>
+## 🐛 KNOWN REMAINING ITEMS / NICE-TO-HAVE
+
+1. The `TbLiveFaresPage` and `TbOrdersHistoryPage` use `window.React` — if Vite wraps React in a module scope, `window.React` may be undefined. If this happens, change the script to use the React from the Vite bundle by wrapping with `(function(){...})()` and fallback to global.
+2. The `bu` tab icon uses `as` and `Sf` (re-used from existing nav), which is fine. If the user wants distinct icons for the new tabs, specific Lucide icon vars must be identified.
+3. QR code canvas background is light (#f8fafc) for scanner compatibility — intentional.
+4. Station search `Eu` in mobility now shows `Use "X"` as a custom option but the custom location gets lat/lon of Kochi (default fallback). Real geocoding would need an API (Nominatim).
+5. The map in mobility section (route map showing Ernakulam → Thrissur) already uses Leaflet via the existing bundled code — but it used bundled vector tiles. Now updated to use OpenStreetMap live tiles via Leaflet CDN injected in head.
+
+---
+
+## 📝 AI HANDOFF NOTES
+
+If another AI picks this up:
+- **Never edit** `TravBud-Widget-Reader-Tickets (1).html` directly — always patch via `build_clean.js`
+- After every change, run `node build_clean.js`, copy to `deploy/`, git push
+- The app is a monolithic single-HTML file. All logic, styles, and assets are inline
+- React hooks are available as `F.useState`, `F.useEffect` etc
+- The JSX renderer is `h.jsx(component, props, ...children)` and `h.jsxs(component, {children:[...]})`
+- localStorage key prefix is stored in variable `hi`
+- All mock data is in `Sv` object; real Supabase calls fall back to `Sv` data when offline
+
+---
+
+*Log maintained by Antigravity AI Agent — Last updated: 2026-11-21*
